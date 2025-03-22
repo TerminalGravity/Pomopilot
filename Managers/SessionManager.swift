@@ -3,6 +3,11 @@ import Foundation
 class SessionManager: ObservableObject {
     @Published var currentSession: Session?
     @Published var sessions: [Session] = []
+    @Published var isExporting = false
+    @Published var exportError: String?
+    @Published var exportSuccess = false
+    
+    private let geminiManager = GeminiAPIManager()
     
     init() {
         loadSessions()
@@ -27,6 +32,20 @@ class SessionManager: ObservableObject {
         ) { [weak self] _ in
             self?.completeCurrentSession()
         }
+        
+        // New observer for break feedback
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("BreakFeedbackReceived"),
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            if let feedbackInfo = notification.object as? [String: String],
+               let workPeriodId = feedbackInfo["workPeriodId"],
+               let feedback = feedbackInfo["feedback"],
+               let aiResponse = feedbackInfo["aiResponse"] {
+                self?.addBreakFeedback(workPeriodId: workPeriodId, feedback: feedback, aiResponse: aiResponse)
+            }
+        }
     }
     
     func startNewSession() {
@@ -41,61 +60,80 @@ class SessionManager: ObservableObject {
         saveCurrentSession()
     }
     
+    func addBreakFeedback(workPeriodId: String, feedback: String, aiResponse: String) {
+        guard var session = currentSession else { return }
+        
+        if let index = session.workPeriods.firstIndex(where: { $0.id.uuidString == workPeriodId }) {
+            var workPeriod = session.workPeriods[index]
+            workPeriod.breakFeedback = feedback
+            workPeriod.aiResponse = aiResponse
+            session.workPeriods[index] = workPeriod
+            currentSession = session
+            saveCurrentSession()
+        }
+    }
+    
     func completeCurrentSession() {
         guard var session = currentSession else { return }
         session.endTime = Date()
         
         // Generate AI report
-        session.aiReport = generateAIReport(for: session)
-        
-        // Update current session
-        currentSession = session
-        
-        // Update sessions list
-        if let index = sessions.firstIndex(where: { $0.id == session.id }) {
-            sessions[index] = session
-        } else {
-            sessions.append(session)
+        generateAIReport(for: session) { [weak self] report in
+            guard let self = self else { return }
+            
+            session.aiReport = report
+            
+            // Update current session
+            self.currentSession = session
+            
+            // Update sessions list
+            if let index = self.sessions.firstIndex(where: { $0.id == session.id }) {
+                self.sessions[index] = session
+            } else {
+                self.sessions.append(session)
+            }
+            
+            self.saveSessions()
         }
-        
-        saveSessions()
     }
     
-    func generateAIReport(for session: Session) -> String {
-        // In a real app, this would call an AI service
-        // For now, we'll simulate it with a rule-based approach
-        
-        let workPeriods = session.workPeriods
-        let totalWorkTime = Int(session.totalWorkDuration / 60)
-        
-        // Extract activities from inputs
-        let activities = workPeriods.compactMap { $0.input.isEmpty ? nil : $0.input }
-        
-        if activities.isEmpty {
-            return "You completed a session with \(workPeriods.count) work periods, totaling \(totalWorkTime) minutes of focused work time. No activities were recorded."
+    func generateAIReport(for session: Session, completion: @escaping (String) -> Void) {
+        // Use Gemini API for report generation
+        geminiManager.generateProductivityReport(workPeriods: session.workPeriods) { report in
+            completion(report)
         }
+    }
+    
+    func exportToGoogleDocs(session: Session) {
+        isExporting = true
+        exportError = nil
+        exportSuccess = false
         
-        // Create the report
-        var report = "Session Summary:\n"
-        report += "- You completed \(workPeriods.count) work periods\n"
-        report += "- Total work time: \(totalWorkTime) minutes\n\n"
+        // In a real app, you would integrate with Google Docs API here
+        // For this example, we'll simulate the export with a delay
         
-        report += "Activities:\n"
-        for (index, activity) in activities.enumerated() {
-            report += "- Period \(index + 1): \(activity)\n"
-        }
-        
-        // Add a simple insight
-        if activities.count > 1 {
-            report += "\nInsight: You were most productive during your "
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            guard let self = self else { return }
             
-            let longestInput = activities.max(by: { $0.count < $1.count }) ?? ""
-            let periodIndex = workPeriods.firstIndex { $0.input == longestInput } ?? 0
+            // Simulate success
+            self.isExporting = false
+            self.exportSuccess = true
             
-            report += "period \(periodIndex + 1) where you wrote the most detailed notes."
+            // Add a fake Google Docs link to the session
+            if var updatedSession = self.sessions.first(where: { $0.id == session.id }) {
+                updatedSession.googleDocsLink = "https://docs.google.com/document/d/\(UUID().uuidString)"
+                
+                if let index = self.sessions.firstIndex(where: { $0.id == session.id }) {
+                    self.sessions[index] = updatedSession
+                    self.saveSessions()
+                }
+            }
+            
+            // Reset success state after a delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                self.exportSuccess = false
+            }
         }
-        
-        return report
     }
     
     private func saveCurrentSession() {
