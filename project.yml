@@ -10,6 +10,7 @@ targets:
     sources:
       - PomopilotApp.swift
       - ContentView.swift
+      - DebugHelper.swift
       - Managers
       - Models
       - Views
