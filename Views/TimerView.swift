@@ -81,6 +81,18 @@ struct TimerView: View {
         .sheet(isPresented: $timerManager.shouldShowInputPrompt) {
             WorkInputView()
         }
+        // AI Reminder Alert (2 minutes before end of work session)
+        .alert("Time to wrap up!", isPresented: $timerManager.showAIReminder) {
+            Button("Got it", role: .cancel) {
+                timerManager.dismissAIInteraction()
+            }
+        } message: {
+            Text(timerManager.aiMessage)
+        }
+        // AI Break Engagement Sheet
+        .sheet(isPresented: $timerManager.showAIBreakEngagement) {
+            BreakEngagementView()
+        }
     }
     
     // Format seconds into minutes:seconds
@@ -101,6 +113,107 @@ struct TimerView: View {
             return .purple
         case .delay:
             return .orange
+        }
+    }
+}
+
+// View for AI break engagement
+struct BreakEngagementView: View {
+    @EnvironmentObject var timerManager: TimerManager
+    @FocusState private var isFeedbackFocused: Bool
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                // Initial AI message
+                AIMessageBubble(message: timerManager.aiMessage)
+                
+                if timerManager.showBreakFeedbackPrompt {
+                    // User feedback input
+                    VStack(alignment: .leading) {
+                        Text("Your response:")
+                            .font(.headline)
+                            .padding(.leading, 5)
+                        
+                        TextEditor(text: $timerManager.userBreakFeedback)
+                            .padding(10)
+                            .frame(height: 120)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                            .focused($isFeedbackFocused)
+                            .onAppear {
+                                isFeedbackFocused = true
+                            }
+                        
+                        HStack {
+                            Button("Skip") {
+                                timerManager.dismissAIInteraction()
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Spacer()
+                            
+                            Button("Submit") {
+                                timerManager.submitBreakFeedback()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(timerManager.userBreakFeedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                    }
+                    .padding(.top)
+                }
+                
+                if timerManager.showAIBreakResponse {
+                    // AI response to user feedback
+                    AIMessageBubble(message: timerManager.aiBreakResponse)
+                    
+                    Button("Continue Break") {
+                        timerManager.dismissAIInteraction()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding(.top)
+                }
+                
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Break Time")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        timerManager.dismissAIInteraction()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// AI message bubble component
+struct AIMessageBubble: View {
+    let message: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "brain.head.profile")
+                .font(.title2)
+                .foregroundColor(.purple)
+                .padding(.trailing, 5)
+            
+            Text(message)
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.purple.opacity(0.1))
+                )
+            
+            Spacer()
         }
     }
 }

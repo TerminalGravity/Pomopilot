@@ -23,6 +23,10 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        NSUserActivityTypes:
+          - com.rinngroup.pomopilot.session
     settings:
       base:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES

@@ -2,27 +2,38 @@ import Foundation
 
 struct DebugHelper {
     static func printDirectoryInfo() {
-        // Print documents directory
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        print("Documents Directory: \(documentsPath?.path ?? "Not available")")
+        // Print current directory
+        print("Current Directory: \(FileManager.default.currentDirectoryPath)")
         
-        // Print temporary directory
-        let tempPath = FileManager.default.temporaryDirectory
-        print("Temporary Directory: \(tempPath.path)")
+        // Print document directory
+        if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            print("Document Directory: \(documentDirectory.path)")
+        }
         
         // Print bundle directory
         print("Bundle Directory: \(Bundle.main.bundlePath)")
         
-        // List contents of bundle
-        do {
-            let bundleContents = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath)
-            print("Bundle Contents: \(bundleContents)")
-        } catch {
-            print("Error listing bundle contents: \(error)")
+        // Print if Gemini API key is configured
+        #if DEBUG
+        if let apiKeyClass = NSClassFromString("Pomopilot.GeminiAPIManager") as? NSObject.Type,
+           let apiKey = apiKeyClass.value(forKey: "apiKey") as? String {
+            print("Gemini API Key: \(apiKey.isEmpty ? "Not configured" : "Configured")")
+        } else {
+            print("Gemini API Key: Could not check (class not loaded)")
+        }
+        #endif
+        
+        // Print UserDefaults data size estimate
+        let keys = ["timerSettings", "savedSessions"]
+        var totalSize = 0
+        
+        for key in keys {
+            if let data = UserDefaults.standard.data(forKey: key) {
+                totalSize += data.count
+                print("UserDefaults - \(key): \(data.count) bytes")
+            }
         }
         
-        // Check UserDefaults
-        print("UserDefaults contains timerSettings: \(UserDefaults.standard.object(forKey: "timerSettings") != nil)")
-        print("UserDefaults contains savedSessions: \(UserDefaults.standard.object(forKey: "savedSessions") != nil)")
+        print("Total UserDefaults size: \(totalSize) bytes")
     }
 } 

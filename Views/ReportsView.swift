@@ -69,6 +69,8 @@ struct SessionRow: View {
 
 struct SessionReportDetailView: View {
     let session: Session
+    @EnvironmentObject var sessionManager: SessionManager
+    @State private var showingExportSuccess = false
     
     var body: some View {
         ScrollView {
@@ -93,10 +95,52 @@ struct SessionReportDetailView: View {
                             .foregroundColor(.blue)
                         Text("Work Periods: \(session.workPeriods.count)")
                     }
+                    
+                    // Show Google Docs link if available
+                    if !session.googleDocsLink.isEmpty {
+                        HStack {
+                            Image(systemName: "doc.text.fill")
+                                .foregroundColor(.blue)
+                            Link("Open in Google Docs", destination: URL(string: session.googleDocsLink)!)
+                                .foregroundColor(.blue)
+                        }
+                    }
                 }
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
+                
+                // Export to Google Docs button
+                Button(action: {
+                    sessionManager.exportToGoogleDocs(session: session)
+                }) {
+                    HStack {
+                        Image(systemName: "arrow.up.doc.fill")
+                        Text(session.googleDocsLink.isEmpty ? "Export to Google Docs" : "Re-export to Google Docs")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .disabled(sessionManager.isExporting)
+                .overlay(
+                    Group {
+                        if sessionManager.isExporting {
+                            HStack {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                Text("Exporting...")
+                                    .foregroundColor(.white)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                        }
+                    }
+                )
                 
                 // AI Report
                 if !session.aiReport.isEmpty {
@@ -124,6 +168,11 @@ struct SessionReportDetailView: View {
         }
         .navigationTitle("Session Report")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Export Successful", isPresented: $sessionManager.exportSuccess) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your session report has been exported to Google Docs.")
+        }
     }
 }
 
@@ -138,18 +187,46 @@ struct WorkPeriodCard: View {
                 .foregroundColor(.primary)
             
             if !period.input.isEmpty {
-                Text(period.input)
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Accomplishments:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Text(period.input)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             } else {
                 Text("No input recorded")
                     .foregroundColor(.secondary)
                     .italic()
             }
             
+            if !period.breakFeedback.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Break Feedback:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                    Text(period.breakFeedback)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            
+            if !period.aiResponse.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("AI Insights:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                    Text(period.aiResponse)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            
             Text("Duration: \(Int(period.duration / 60)) minutes")
                 .font(.caption)
                 .foregroundColor(.secondary)
+                .padding(.top, 2)
         }
         .padding()
         .background(Color(.systemGray6))

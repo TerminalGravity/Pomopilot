@@ -1,46 +1,65 @@
 # Pomopilot
 
-An AI-enhanced Pomodoro timer app for iPhone that helps you track and analyze your productivity.
+Pomopilot is an AI-powered Pomodoro timer app that boosts productivity by integrating the classic Pomodoro technique with the Gemini API. It helps users manage their work sessions, provides intelligent insights, and creates comprehensive work logs.
 
 ## Features
 
-- **Chained Pomodoro Timers**: Automatically run multiple Pomodoro cycles with configurable work sessions, short breaks, and long breaks.
-- **Session Tracking**: Keep a record of your completed sessions and what you accomplished during each work period.
-- **AI Analysis**: Get insights and summaries of your productivity after each complete session.
-- **Customizable Settings**: Adjust all timer durations, number of cycles, and delays between timers.
-- **Persistent Storage**: Your sessions and settings are saved locally on your device.
-- **Background Notifications**: Get notified when timers complete, even when the app is in the background.
+- **Pomodoro Timer**: Customize your work and break sessions with an easy-to-use timer interface
+- **AI Integration**: Interact with the Gemini API during your work sessions and breaks
+- **Session Tracking**: Record what you accomplish during each work period
+- **Break Engagement**: Receive thoughtful prompts during breaks to help you reflect on your work
+- **Comprehensive Reports**: View detailed reports of your work sessions with AI-generated insights
+- **Google Docs Export**: Export your session logs to Google Docs for sharing and reviewing
 
-## App Structure
+## Getting Started
 
-The app is built with SwiftUI using a clean architecture:
+### Prerequisites
 
-- **Models**: Data structures for timer settings, work periods, and sessions
-- **Managers**: Business logic for timer operations and session management
-- **Views**: User interface components
+- iOS 16.0 or later
+- Xcode 14.0 or later
+- Gemini API key (for AI functionality)
 
-## Usage
+### Installation
 
-1. **Timer Tab**: Start, pause, or stop Pomodoro sessions. Input what you accomplished after each work period.
-2. **Reports Tab**: View your past sessions, including AI-generated summaries and details of your work.
-3. **Settings Tab**: Customize timer durations and session structure to suit your workflow.
-
-## Installation
-
-1. Clone the repository
+1. Clone this repository
 2. Open the project in Xcode
-3. Build and run on your iOS device or simulator
+3. Add your Gemini API key in `Managers/GeminiAPIManager.swift`
+4. Build and run the app on your device or simulator
 
-## Requirements
+### Setting Up the Gemini API
 
-- iOS 15.0+
-- Xcode 13.0+
-- Swift 5.5+
+To use the AI features in Pomopilot, you'll need a Gemini API key:
+
+1. Visit [Google AI Studio](https://makersuite.google.com/) and create an account
+2. Generate an API key
+3. Open `Managers/GeminiAPIManager.swift` and replace the empty string in `private let apiKey: String = ""` with your API key
+
+## How to Use
+
+1. **Start a Work Session**: Tap the play button to begin a 25-minute work session
+2. **Receive AI Reminders**: 2 minutes before your session ends, the AI will remind you to wrap up
+3. **Log Your Work**: After each session, record what you accomplished
+4. **Break Engagement**: During breaks, the AI will ask reflective questions to help improve your productivity
+5. **View Reports**: Check the Reports tab to see your session history and AI-generated insights
+6. **Export to Google Docs**: Share your work logs with stakeholders by exporting to Google Docs
+
+## Customization
+
+Visit the Settings tab to customize:
+- Work session duration
+- Break duration
+- Number of cycles before a long break
+
+## Development Notes
+
+- Built with SwiftUI for a modern, responsive interface
+- Uses the Gemini API for AI integration
+- Implements MVVM architecture with clear separation of concerns
+- Follows Apple's Human Interface Guidelines
 
 ## Future Enhancements
 
-- Integration with a more sophisticated AI service for deeper insights
-- Cloud sync for session data across devices
-- Custom themes and sound options
-- Widget support for quick timer access from home screen
-- Apple Watch companion app 
+- Complete Google Docs API integration
+- Additional AI-powered productivity insights
+- Integration with task management systems
+- Team collaboration features 

@@ -18,6 +18,7 @@
 		B97633FA922D0A28CB97FE78 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C31267CAB75D4AB86C4D7DF /* ReportsView.swift */; };
 		BA52BE0619222C9DBE1EF77C /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF77A906F89FA7C54873A455 /* TimerManager.swift */; };
 		D35A67D5DCBB8A2280549641 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8203D050EEC723E62D7820EA /* Assets.xcassets */; };
+		E017CABDF3A0460A9F1EA1B9 /* GeminiAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B081CE5C2BD129207BB5846F /* GeminiAPIManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		828E343291F20DAFE0AD7005 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		918AF0B763EEA80D47EB8591 /* DebugHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelper.swift; sourceTree = "<group>"; };
 		A3B14FE8D44678EC25B22697 /* Pomopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pomopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B081CE5C2BD129207BB5846F /* GeminiAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiAPIManager.swift; sourceTree = "<group>"; };
 		CF77A906F89FA7C54873A455 /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
 		D3D94E42818120AB8A0E5B08 /* PomopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomopilotApp.swift; sourceTree = "<group>"; };
 		E40A673E67F03FE794DBD397 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 		DAC0BAC586C99EB7C5F67625 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				B081CE5C2BD129207BB5846F /* GeminiAPIManager.swift */,
 				E6ACAFDC1E319296A773D993 /* SessionManager.swift */,
 				CF77A906F89FA7C54873A455 /* TimerManager.swift */,
 			);
@@ -154,6 +157,7 @@
 			files = (
 				352E060E206686FA192A23C4 /* ContentView.swift in Sources */,
 				4AFECB2BED3BBDF9A9BBD5CC /* DebugHelper.swift in Sources */,
+				E017CABDF3A0460A9F1EA1B9 /* GeminiAPIManager.swift in Sources */,
 				859F2FC1885089CF3E8D99CB /* PomopilotApp.swift in Sources */,
 				B97633FA922D0A28CB97FE78 /* ReportsView.swift in Sources */,
 				386A1A6A9AF1E4659153D8F7 /* SessionManager.swift in Sources */,
