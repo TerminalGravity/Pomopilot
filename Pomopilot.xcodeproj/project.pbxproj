@@ -1,0 +1,331 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08D3373998174C2134EFAA89 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40A673E67F03FE794DBD397 /* TimerView.swift */; };
+		352E060E206686FA192A23C4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4B660D73F4C7DD893C99D6 /* ContentView.swift */; };
+		368D6EB0CA7BAF4C1C40B564 /* WorkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771A599F7237755078C763FA /* WorkSession.swift */; };
+		386A1A6A9AF1E4659153D8F7 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6ACAFDC1E319296A773D993 /* SessionManager.swift */; };
+		5FC70641E822C5B8FE7C994D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828E343291F20DAFE0AD7005 /* SettingsView.swift */; };
+		859F2FC1885089CF3E8D99CB /* PomopilotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D94E42818120AB8A0E5B08 /* PomopilotApp.swift */; };
+		AEC01BC383FD8E8367CFBF4D /* TimerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CAFD1C5CD51A97D17202CD /* TimerSettings.swift */; };
+		B97633FA922D0A28CB97FE78 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C31267CAB75D4AB86C4D7DF /* ReportsView.swift */; };
+		BA52BE0619222C9DBE1EF77C /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF77A906F89FA7C54873A455 /* TimerManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		18CAFD1C5CD51A97D17202CD /* TimerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerSettings.swift; sourceTree = "<group>"; };
+		2C31267CAB75D4AB86C4D7DF /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		4D4B660D73F4C7DD893C99D6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		771A599F7237755078C763FA /* WorkSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkSession.swift; sourceTree = "<group>"; };
+		828E343291F20DAFE0AD7005 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A3B14FE8D44678EC25B22697 /* Pomopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pomopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF77A906F89FA7C54873A455 /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
+		D3D94E42818120AB8A0E5B08 /* PomopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomopilotApp.swift; sourceTree = "<group>"; };
+		E40A673E67F03FE794DBD397 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		E6ACAFDC1E319296A773D993 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2C5DF5ACEAFE0B092679C4B6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				18CAFD1C5CD51A97D17202CD /* TimerSettings.swift */,
+				771A599F7237755078C763FA /* WorkSession.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4837A92D841ED803423C3B67 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2C31267CAB75D4AB86C4D7DF /* ReportsView.swift */,
+				828E343291F20DAFE0AD7005 /* SettingsView.swift */,
+				E40A673E67F03FE794DBD397 /* TimerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		50F173C4F09B937295D203C1 = {
+			isa = PBXGroup;
+			children = (
+				4D4B660D73F4C7DD893C99D6 /* ContentView.swift */,
+				D3D94E42818120AB8A0E5B08 /* PomopilotApp.swift */,
+				DAC0BAC586C99EB7C5F67625 /* Managers */,
+				2C5DF5ACEAFE0B092679C4B6 /* Models */,
+				4837A92D841ED803423C3B67 /* Views */,
+				7C81CEB85FE7481B55786737 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7C81CEB85FE7481B55786737 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A3B14FE8D44678EC25B22697 /* Pomopilot.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DAC0BAC586C99EB7C5F67625 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				E6ACAFDC1E319296A773D993 /* SessionManager.swift */,
+				CF77A906F89FA7C54873A455 /* TimerManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		81D520FD4C5495B4CB2BF0DE /* Pomopilot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C25F6C2F418720B6B84337E9 /* Build configuration list for PBXNativeTarget "Pomopilot" */;
+			buildPhases = (
+				D7D951F80F222F870D24966D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Pomopilot;
+			productName = Pomopilot;
+			productReference = A3B14FE8D44678EC25B22697 /* Pomopilot.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2971C6D10E780E6B7D1ADA2D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					81D520FD4C5495B4CB2BF0DE = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = C8DF98F6C807FB12D17D9DB7 /* Build configuration list for PBXProject "Pomopilot" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 50F173C4F09B937295D203C1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				81D520FD4C5495B4CB2BF0DE /* Pomopilot */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D7D951F80F222F870D24966D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				352E060E206686FA192A23C4 /* ContentView.swift in Sources */,
+				859F2FC1885089CF3E8D99CB /* PomopilotApp.swift in Sources */,
+				B97633FA922D0A28CB97FE78 /* ReportsView.swift in Sources */,
+				386A1A6A9AF1E4659153D8F7 /* SessionManager.swift in Sources */,
+				5FC70641E822C5B8FE7C994D /* SettingsView.swift in Sources */,
+				BA52BE0619222C9DBE1EF77C /* TimerManager.swift in Sources */,
+				AEC01BC383FD8E8367CFBF4D /* TimerSettings.swift in Sources */,
+				08D3373998174C2134EFAA89 /* TimerView.swift in Sources */,
+				368D6EB0CA7BAF4C1C40B564 /* WorkSession.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6A58AC7C22F575DA89A2EFAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rinngroup.Pomopilot;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		738CE504D2B2CDF3B572A4D5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rinngroup.Pomopilot;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7F0433470C1BE31F452A7A76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D3FC87F788CA7821588E85BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C25F6C2F418720B6B84337E9 /* Build configuration list for PBXNativeTarget "Pomopilot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				738CE504D2B2CDF3B572A4D5 /* Debug */,
+				6A58AC7C22F575DA89A2EFAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C8DF98F6C807FB12D17D9DB7 /* Build configuration list for PBXProject "Pomopilot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3FC87F788CA7821588E85BB /* Debug */,
+				7F0433470C1BE31F452A7A76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2971C6D10E780E6B7D1ADA2D /* Project object */;
+}

@@ -1,0 +1,28 @@
+name: Pomopilot
+options:
+  bundleIdPrefix: com.rinngroup
+  deploymentTarget:
+    iOS: 16.0
+targets:
+  Pomopilot:
+    type: application
+    platform: iOS
+    sources:
+      - PomopilotApp.swift
+      - ContentView.swift
+      - Managers
+      - Models
+      - Views
+    info:
+      path: Info.plist
+      properties:
+        UILaunchStoryboardName: ""
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+    settings:
+      base:
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        DEVELOPMENT_TEAM: "" # You can add your team ID here if needed
+    dependencies: [] 
