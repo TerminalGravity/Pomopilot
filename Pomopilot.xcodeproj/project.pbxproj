@@ -16,6 +16,7 @@
 		AEC01BC383FD8E8367CFBF4D /* TimerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CAFD1C5CD51A97D17202CD /* TimerSettings.swift */; };
 		B97633FA922D0A28CB97FE78 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C31267CAB75D4AB86C4D7DF /* ReportsView.swift */; };
 		BA52BE0619222C9DBE1EF77C /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF77A906F89FA7C54873A455 /* TimerManager.swift */; };
+		D35A67D5DCBB8A2280549641 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8203D050EEC723E62D7820EA /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		2C31267CAB75D4AB86C4D7DF /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
 		4D4B660D73F4C7DD893C99D6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		771A599F7237755078C763FA /* WorkSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkSession.swift; sourceTree = "<group>"; };
+		8203D050EEC723E62D7820EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		828E343291F20DAFE0AD7005 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A3B14FE8D44678EC25B22697 /* Pomopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pomopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF77A906F89FA7C54873A455 /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 		50F173C4F09B937295D203C1 = {
 			isa = PBXGroup;
 			children = (
+				8203D050EEC723E62D7820EA /* Assets.xcassets */,
 				4D4B660D73F4C7DD893C99D6 /* ContentView.swift */,
 				D3D94E42818120AB8A0E5B08 /* PomopilotApp.swift */,
 				DAC0BAC586C99EB7C5F67625 /* Managers */,
@@ -88,6 +91,7 @@
 			buildConfigurationList = C25F6C2F418720B6B84337E9 /* Build configuration list for PBXNativeTarget "Pomopilot" */;
 			buildPhases = (
 				D7D951F80F222F870D24966D /* Sources */,
+				D70DE050116A302DA2486B79 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -128,6 +132,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D70DE050116A302DA2486B79 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D35A67D5DCBB8A2280549641 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D7D951F80F222F870D24966D /* Sources */ = {
