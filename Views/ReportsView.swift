@@ -210,6 +210,13 @@ struct WorkPeriodCard: View {
                             .foregroundColor(.purple)
                         Text("Voice Conversation")
                             .foregroundColor(.purple)
+                        
+                        if !period.voiceUsed.isEmpty {
+                            Text("(\(period.voiceUsed))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
                         Spacer()
                         Image(systemName: showVoiceConversation ? "chevron.up" : "chevron.down")
                             .foregroundColor(.purple)
@@ -218,12 +225,25 @@ struct WorkPeriodCard: View {
                 }
                 
                 if showVoiceConversation {
-                    Text(period.voiceConversation)
-                        .font(.body)
-                        .padding(10)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                        .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(period.voiceConversation)
+                            .font(.body)
+                            .padding(10)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        if !period.voiceUsed.isEmpty {
+                            HStack {
+                                Image(systemName: "speaker.wave.2")
+                                    .foregroundColor(.purple)
+                                Text("AI Voice: \(period.voiceUsed)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.leading, 10)
+                        }
+                    }
                 }
             }
             

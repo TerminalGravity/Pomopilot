@@ -26,6 +26,9 @@ class TimerManager: ObservableObject {
     @Published var aiBreakResponse: String = ""
     @Published var showAIBreakResponse: Bool = false
     
+    // Selected voice for Gemini Live API
+    @Published var selectedVoice: GeminiAPIManager.GeminiVoice = .kore
+    
     private var timer: Timer?
     private var startDate: Date?
     private var workPeriod: WorkPeriod?
@@ -40,9 +43,20 @@ class TimerManager: ObservableObject {
         return Double(totalTime - timeRemaining) / Double(totalTime)
     }
     
+    // Add a method to access the GeminiAPIManager
+    func getGeminiManager() -> GeminiAPIManager {
+        return geminiManager
+    }
+    
     init() {
         resetTimer()
         requestNotificationPermission()
+        
+        // Load selected voice from UserDefaults if available
+        if let savedVoice = UserDefaults.standard.string(forKey: "selectedGeminiVoice"),
+           let voice = GeminiAPIManager.GeminiVoice(rawValue: savedVoice) {
+            selectedVoice = voice
+        }
     }
     
     func requestNotificationPermission() {
@@ -77,6 +91,15 @@ class TimerManager: ObservableObject {
             self.voiceConversationText = conversation
             self.shouldShowVoiceInteraction = false
             self.startTimerInternal()
+        }
+    }
+    
+    // Update the selected voice
+    func updateSelectedVoice(_ voice: GeminiAPIManager.GeminiVoice) {
+        DispatchQueue.main.async {
+            self.selectedVoice = voice
+            // Save to UserDefaults for persistence
+            UserDefaults.standard.set(voice.rawValue, forKey: "selectedGeminiVoice")
         }
     }
     
@@ -145,6 +168,9 @@ class TimerManager: ObservableObject {
                     if newWorkPeriod.taskDescription.isEmpty {
                         newWorkPeriod.taskDescription = extractTaskFromConversation(voiceConversationText)
                     }
+                    
+                    // Add the selected voice information
+                    newWorkPeriod.voiceUsed = selectedVoice.rawValue
                 }
             }
             
@@ -181,20 +207,7 @@ class TimerManager: ObservableObject {
     
     // Extract a task description from the conversation
     private func extractTaskFromConversation(_ conversation: String) -> String {
-        // Simple extraction - look for key phrases and take the text that follows
-        let lines = conversation.split(separator: "\n")
-        for line in lines {
-            let lowercaseLine = line.lowercased()
-            if lowercaseLine.contains("working on") || 
-               lowercaseLine.contains("focus on") || 
-               lowercaseLine.contains("going to") {
-                // Return this line or try to extract just the relevant part
-                return String(line)
-            }
-        }
-        
-        // If no specific task mention found, return a generic task from the conversation
-        return "Task extracted from conversation"
+        return geminiManager.extractTaskFromConversation(conversation)
     }
     
     func pause() {
@@ -279,6 +292,15 @@ class TimerManager: ObservableObject {
             self.showAIBreakEngagement = false
             self.showBreakFeedbackPrompt = false
             self.showAIBreakResponse = false
+        }
+    }
+    
+    // Method to show voice interaction during a running timer
+    func showVoiceInteractionDuringTimer() {
+        DispatchQueue.main.async {
+            if self.isRunning {
+                self.shouldShowVoiceInteraction = true
+            }
         }
     }
     

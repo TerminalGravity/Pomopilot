@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		08D3373998174C2134EFAA89 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40A673E67F03FE794DBD397 /* TimerView.swift */; };
+		31F048D5C0B86709F503C5C9 /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 18977C1384B11E783A01CD5A /* GoogleGenerativeAI */; };
 		352E060E206686FA192A23C4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4B660D73F4C7DD893C99D6 /* ContentView.swift */; };
 		368D6EB0CA7BAF4C1C40B564 /* WorkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771A599F7237755078C763FA /* WorkSession.swift */; };
 		386A1A6A9AF1E4659153D8F7 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6ACAFDC1E319296A773D993 /* SessionManager.swift */; };
@@ -38,6 +39,17 @@
 		E40A673E67F03FE794DBD397 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		E6ACAFDC1E319296A773D993 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6306E60716879752773B1904 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31F048D5C0B86709F503C5C9 /* GoogleGenerativeAI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		2C5DF5ACEAFE0B092679C4B6 /* Models */ = {
@@ -101,12 +113,16 @@
 			buildPhases = (
 				D7D951F80F222F870D24966D /* Sources */,
 				D70DE050116A302DA2486B79 /* Resources */,
+				6306E60716879752773B1904 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Pomopilot;
+			packageProductDependencies = (
+				18977C1384B11E783A01CD5A /* GoogleGenerativeAI */,
+			);
 			productName = Pomopilot;
 			productReference = A3B14FE8D44678EC25B22697 /* Pomopilot.app */;
 			productType = "com.apple.product-type.application";
@@ -134,6 +150,9 @@
 				en,
 			);
 			mainGroup = 50F173C4F09B937295D203C1;
+			packageReferences = (
+				3FCBE698597406071225F582 /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -353,6 +372,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3FCBE698597406071225F582 /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/generative-ai-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		18977C1384B11E783A01CD5A /* GoogleGenerativeAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3FCBE698597406071225F582 /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
+			productName = GoogleGenerativeAI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2971C6D10E780E6B7D1ADA2D /* Project object */;
 }

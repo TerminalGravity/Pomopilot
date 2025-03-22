@@ -123,6 +123,8 @@ struct SettingsView: View {
                     .foregroundColor(.red)
                 }
             }
+            .listStyle(GroupedListStyle())
+            .environment(\.horizontalSizeClass, .regular)
             .navigationTitle("Settings")
             .overlay(
                 Group {

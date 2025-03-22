@@ -29,6 +29,8 @@ targets:
           - com.rinngroup.pomopilot.session
         NSMicrophoneUsageDescription: "Pomopilot needs microphone access to enable voice interaction with the AI assistant."
         NSSpeechRecognitionUsageDescription: "Pomopilot needs speech recognition permission to understand your voice commands."
+        # Gemini API key
+        GEMINI_API_KEY: "AIzaSyBqP70sf6WHU61M3lDm5Qs2zgTcshuf4o8"
     settings:
       base:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
@@ -38,4 +40,4 @@ targets:
 packages:
   GoogleGenerativeAI:
     url: https://github.com/google/generative-ai-swift
-    from: 0.4.4 
+    from: 0.5.0 # Using latest version that supports Live API 

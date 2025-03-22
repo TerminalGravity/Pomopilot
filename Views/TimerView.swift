@@ -44,6 +44,27 @@ struct TimerView: View {
                 animateProgress = true
             }
             
+            // Voice interaction button
+            if timerManager.isRunning {
+                Button(action: {
+                    timerManager.showVoiceInteractionDuringTimer()
+                }) {
+                    HStack {
+                        Image(systemName: "waveform.circle.fill")
+                            .font(.title2)
+                        Text("Talk to Gemini")
+                            .fontWeight(.medium)
+                    }
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.purple.opacity(0.2))
+                    )
+                    .foregroundColor(.purple)
+                }
+                .transition(.scale.combined(with: .opacity))
+            }
+            
             // Control buttons
             HStack(spacing: 30) {
                 Button(action: {

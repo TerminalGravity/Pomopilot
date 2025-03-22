@@ -1,14 +1,46 @@
 import Foundation
 import Combine
+import GoogleGenerativeAI
 
 class GeminiAPIManager: ObservableObject {
     // API configuration
-    private let apiKey: String
+    private(set) var apiKey: String
     private let apiBaseURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
     
     // Published properties
     @Published var isLoading = false
     @Published var errorMessage: String?
+    
+    // Voice support - Live API voices
+    enum GeminiVoice: String, CaseIterable, Identifiable {
+        case aoede = "Aoede"
+        case charon = "Charon"
+        case fenrir = "Fenrir"
+        case kore = "Kore"
+        case puck = "Puck"
+        
+        var id: String { rawValue }
+        
+        var description: String {
+            switch self {
+            case .aoede: return "Aoede - Female, gentle tone"
+            case .charon: return "Charon - Male, deep voice"
+            case .fenrir: return "Fenrir - Male, strong accent"
+            case .kore: return "Kore - Female, professional tone"
+            case .puck: return "Puck - Male, playful tone"
+            }
+        }
+        
+        var voiceConfig: [String: Any] {
+            return [
+                "voiceConfig": [
+                    "prebuiltVoiceConfig": [
+                        "voiceName": self.rawValue
+                    ]
+                ]
+            ]
+        }
+    }
     
     init() {
         // Load API key from environment or secure storage
@@ -19,11 +51,50 @@ class GeminiAPIManager: ObservableObject {
         } else {
             // For development only - never ship with hardcoded keys
             #if DEBUG
-            self.apiKey = "" // Development placeholder
+            // API key from Google AI Studio (https://aistudio.google.com/app/apikey)
+            self.apiKey = "AIzaSyBqP70sf6WHU61M3lDm5Qs2zgTcshuf4o8"
             #else
-            self.apiKey = ""
+            self.apiKey = "AIzaSyBqP70sf6WHU61M3lDm5Qs2zgTcshuf4o8"
             #endif
         }
+    }
+    
+    // Get available voice options from Gemini Live API
+    func getAvailableVoices() -> [GeminiVoice] {
+        return GeminiVoice.allCases
+    }
+    
+    // Create a GenerativeModel with the Live API configuration and selected voice
+    func createLiveModel(voiceName: GeminiVoice) -> GenerativeModel {
+        // Use the correct enum values for the HarmCategory
+        let safetySettings = [
+            SafetySetting(harmCategory: .harassment, threshold: .blockNone),
+            SafetySetting(harmCategory: .sexuallyExplicit, threshold: .blockNone),
+            SafetySetting(harmCategory: .dangerousContent, threshold: .blockNone)
+        ]
+        
+        let config = GenerationConfig(
+            temperature: 0.7,
+            topP: 0.95,
+            topK: 64,
+            maxOutputTokens: 2048
+        )
+        
+        // Voice configuration for Live API
+        let systemInstruction = """
+        You are a friendly AI assistant named PomoPilot that helps people stay focused and productive.
+        You should engage in natural conversation and help users set up their Pomodoro sessions.
+        Ask them about what they're working on and be encouraging.
+        Keep responses short and helpful, around 1-2 sentences.
+        """
+        
+        return GenerativeModel(
+            name: "gemini-1.5-flash",
+            apiKey: apiKey,
+            generationConfig: config,
+            safetySettings: safetySettings,
+            systemInstruction: systemInstruction
+        )
     }
     
     // Process conversation input for voice interaction feature
@@ -211,4 +282,55 @@ class GeminiAPIManager: ObservableObject {
         }
         return "I'm here to help you stay productive. What would you like to focus on during your Pomodoro session today?"
     }
+    
+    // Method to extract task description from conversation
+    func extractTaskFromConversation(_ conversation: String) -> String {
+        // If conversation is empty, return empty string
+        if conversation.isEmpty {
+            return ""
+        }
+        
+        // Define keywords that might indicate a task description
+        let taskIndicators = ["work on", "working on", "focus on", "focusing on", "task is", "project is"]
+        
+        // Split conversation into sentences
+        let sentences = conversation.components(separatedBy: [".", "!", "?"])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        
+        // First look for sentences with task indicators
+        for sentence in sentences {
+            let lowercaseSentence = sentence.lowercased()
+            for indicator in taskIndicators {
+                if lowercaseSentence.contains(indicator) {
+                    // Extract text after the indicator
+                    if let range = lowercaseSentence.range(of: indicator) {
+                        let startIndex = lowercaseSentence.index(range.upperBound, offsetBy: 0)
+                        let taskDescription = sentence[startIndex...].trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !taskDescription.isEmpty {
+                            return taskDescription
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If no clear indicator, use the first complete sentence as a fallback
+        if !sentences.isEmpty {
+            return sentences[0]
+        }
+        
+        // Last resort: just return the whole conversation if it's short
+        if conversation.count < 100 {
+            return conversation
+        }
+        
+        return ""
+    }
+}
+
+// Voice option structure
+struct VoiceOption: Identifiable, Hashable {
+    var id: String
+    var name: String
 } 

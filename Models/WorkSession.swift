@@ -16,6 +16,7 @@ struct WorkPeriod: Identifiable, Codable {
     var input: String = ""
     var taskDescription: String = "" // What the user is working on for this period
     var voiceConversation: String = "" // Conversation from voice interaction
+    var voiceUsed: String = "" // The voice used for this conversation
     var breakFeedback: String = ""
     var aiResponse: String = ""
     
@@ -65,6 +66,10 @@ struct Session: Identifiable, Codable {
             
             if !period.voiceConversation.isEmpty {
                 report += "**Initial Conversation:**\n\(period.voiceConversation)\n\n"
+                
+                if !period.voiceUsed.isEmpty {
+                    report += "**Voice Assistant Used:** \(period.voiceUsed)\n\n"
+                }
             }
             
             report += "**Accomplishments:**\n\(period.input)\n\n"

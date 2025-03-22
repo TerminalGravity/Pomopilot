@@ -18,11 +18,17 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>GEMINI_API_KEY</key>
+	<string>AIzaSyBqP70sf6WHU61M3lDm5Qs2zgTcshuf4o8</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Pomopilot needs microphone access to enable voice interaction with the AI assistant.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Pomopilot needs speech recognition permission to understand your voice commands.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>com.rinngroup.pomopilot.session</string>
