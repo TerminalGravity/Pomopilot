@@ -10,6 +10,13 @@ class TimerManager: ObservableObject {
     @Published var shouldShowInputPrompt = false
     @Published var currentInput = ""
     
+    // New property for session start prompt
+    @Published var shouldShowSessionStartPrompt = false
+    @Published var sessionStartInput = ""
+    
+    // New property for voice interaction
+    @Published var shouldShowVoiceInteraction = false
+    
     // AI-related properties
     @Published var aiMessage: String = ""
     @Published var showAIReminder: Bool = false
@@ -25,6 +32,8 @@ class TimerManager: ObservableObject {
     private let geminiManager = GeminiAPIManager()
     private var reminderShown = false
     private var breakEngagementTimer: Timer?
+    private var timerQueue = DispatchQueue(label: "com.pomopilot.timerQueue")
+    private var voiceConversationText = ""
     
     var progress: Double {
         let totalTime = getTotalTimeForCurrentTimer()
@@ -62,19 +71,94 @@ class TimerManager: ObservableObject {
         }
     }
     
+    // Begin timer after getting voice conversation
+    func startTimerWithConversation(_ conversation: String) {
+        DispatchQueue.main.async {
+            self.voiceConversationText = conversation
+            self.shouldShowVoiceInteraction = false
+            self.startTimerInternal()
+        }
+    }
+    
+    // Begin timer after getting session start input
+    func startTimerWithInput(_ taskDescription: String) {
+        DispatchQueue.main.async {
+            self.sessionStartInput = taskDescription
+            self.shouldShowSessionStartPrompt = false
+            self.startTimerInternal()
+        }
+    }
+    
+    // Method to prompt for session start input
+    func promptForSessionStart() {
+        DispatchQueue.main.async {
+            self.sessionStartInput = ""
+            self.shouldShowSessionStartPrompt = true
+        }
+    }
+    
+    // Method to show voice interaction
+    func promptForVoiceInteraction() {
+        DispatchQueue.main.async {
+            self.voiceConversationText = ""
+            self.shouldShowVoiceInteraction = true
+        }
+    }
+    
+    // Method to start the timer
     func start() {
         if !isRunning {
-            isRunning = true
-            startDate = Date()
+            // If this is a work period and we're at the beginning of a cycle, prompt based on user preference
+            if currentTimerType == .work && currentCycle == 1 {
+                // Check for user preference: voice or text input
+                // For this implementation, let's default to voice
+                if settings.useVoiceInteraction {
+                    promptForVoiceInteraction()
+                } else {
+                    promptForSessionStart()
+                }
+            } else {
+                startTimerInternal()
+            }
+        }
+    }
+    
+    // Internal timer start method that actually starts the timer
+    private func startTimerInternal() {
+        isRunning = true
+        startDate = Date()
+        
+        if currentTimerType == .work {
+            // Create work period with the task description and/or conversation
+            var newWorkPeriod = WorkPeriod(startTime: Date())
             
-            if currentTimerType == .work {
-                workPeriod = WorkPeriod(startTime: Date())
+            // Add the task description if this is the first period in a new session
+            if currentCycle == 1 {
+                if !sessionStartInput.isEmpty {
+                    newWorkPeriod.taskDescription = sessionStartInput
+                }
+                
+                if !voiceConversationText.isEmpty {
+                    newWorkPeriod.voiceConversation = voiceConversationText
+                    
+                    // Extract a task description from conversation if none provided
+                    if newWorkPeriod.taskDescription.isEmpty {
+                        newWorkPeriod.taskDescription = extractTaskFromConversation(voiceConversationText)
+                    }
+                }
             }
             
-            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-                guard let self = self else { return }
+            workPeriod = newWorkPeriod
+        }
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.timerQueue.async {
                 if self.timeRemaining > 0 {
-                    self.timeRemaining -= 1
+                    DispatchQueue.main.async {
+                        self.timeRemaining -= 1
+                    }
                     
                     // Check for 2-minute reminder if in work mode
                     if self.currentTimerType == .work && self.timeRemaining == 120 && !self.reminderShown {
@@ -87,10 +171,30 @@ class TimerManager: ObservableObject {
                         self.scheduleBreakEngagement()
                     }
                 } else {
-                    self.timerComplete()
+                    DispatchQueue.main.async {
+                        self.timerComplete()
+                    }
                 }
             }
         }
+    }
+    
+    // Extract a task description from the conversation
+    private func extractTaskFromConversation(_ conversation: String) -> String {
+        // Simple extraction - look for key phrases and take the text that follows
+        let lines = conversation.split(separator: "\n")
+        for line in lines {
+            let lowercaseLine = line.lowercased()
+            if lowercaseLine.contains("working on") || 
+               lowercaseLine.contains("focus on") || 
+               lowercaseLine.contains("going to") {
+                // Return this line or try to extract just the relevant part
+                return String(line)
+            }
+        }
+        
+        // If no specific task mention found, return a generic task from the conversation
+        return "Task extracted from conversation"
     }
     
     func pause() {
@@ -140,11 +244,15 @@ class TimerManager: ObservableObject {
     
     func submitBreakFeedback() {
         if userBreakFeedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            showBreakFeedbackPrompt = false
+            DispatchQueue.main.async {
+                self.showBreakFeedbackPrompt = false
+            }
             return
         }
         
-        geminiManager.processBreakFeedback(feedback: userBreakFeedback) { [weak self] response in
+        let feedback = userBreakFeedback // Capture current value
+        
+        geminiManager.processBreakFeedback(feedback: feedback) { [weak self] response in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 self.aiBreakResponse = response
@@ -155,7 +263,7 @@ class TimerManager: ObservableObject {
                 if let wp = self.workPeriod {
                     NotificationCenter.default.post(
                         name: NSNotification.Name("BreakFeedbackReceived"), 
-                        object: ["workPeriodId": wp.id.uuidString, "feedback": self.userBreakFeedback, "aiResponse": response]
+                        object: ["workPeriodId": wp.id.uuidString, "feedback": feedback, "aiResponse": response]
                     )
                 }
                 
@@ -166,10 +274,12 @@ class TimerManager: ObservableObject {
     }
     
     func dismissAIInteraction() {
-        showAIReminder = false
-        showAIBreakEngagement = false
-        showBreakFeedbackPrompt = false
-        showAIBreakResponse = false
+        DispatchQueue.main.async {
+            self.showAIReminder = false
+            self.showAIBreakEngagement = false
+            self.showBreakFeedbackPrompt = false
+            self.showAIBreakResponse = false
+        }
     }
     
     func timerComplete() {
@@ -186,7 +296,10 @@ class TimerManager: ObservableObject {
                 var updatedWorkPeriod = wp
                 updatedWorkPeriod.endTime = Date()
                 workPeriod = updatedWorkPeriod
-                shouldShowInputPrompt = true
+                
+                DispatchQueue.main.async {
+                    self.shouldShowInputPrompt = true
+                }
             }
         } else {
             moveToNextTimer()
@@ -197,38 +310,44 @@ class TimerManager: ObservableObject {
         if var wp = workPeriod {
             wp.input = currentInput
             NotificationCenter.default.post(name: NSNotification.Name("WorkPeriodCompleted"), object: wp)
-            currentInput = ""
-            shouldShowInputPrompt = false
+            
+            DispatchQueue.main.async {
+                self.currentInput = ""
+                self.shouldShowInputPrompt = false
+            }
+            
             workPeriod = nil
             moveToNextTimer()
         }
     }
     
     func moveToNextTimer() {
-        switch currentTimerType {
-        case .work:
-            currentTimerType = .delay
-            timeRemaining = settings.delayBetweenTimers
-            start()
-            
-        case .delay:
-            let isLongBreakDue = currentCycle % settings.cyclesBeforeLongBreak == 0
-            currentTimerType = isLongBreakDue ? .longBreak : .shortBreak
-            resetTimer()
-            start()
-            
-        case .shortBreak, .longBreak:
-            if currentTimerType == .longBreak {
-                // One full cycle completed
-                currentCycle = 1
-                NotificationCenter.default.post(name: NSNotification.Name("SessionCompleted"), object: nil)
-            } else {
-                currentCycle += 1
+        DispatchQueue.main.async {
+            switch self.currentTimerType {
+            case .work:
+                self.currentTimerType = .delay
+                self.timeRemaining = self.settings.delayBetweenTimers
+                self.start()
+                
+            case .delay:
+                let isLongBreakDue = self.currentCycle % self.settings.cyclesBeforeLongBreak == 0
+                self.currentTimerType = isLongBreakDue ? .longBreak : .shortBreak
+                self.resetTimer()
+                self.start()
+                
+            case .shortBreak, .longBreak:
+                if self.currentTimerType == .longBreak {
+                    // One full cycle completed
+                    self.currentCycle = 1
+                    NotificationCenter.default.post(name: NSNotification.Name("SessionCompleted"), object: nil)
+                } else {
+                    self.currentCycle += 1
+                }
+                
+                self.currentTimerType = .delay
+                self.timeRemaining = self.settings.delayBetweenTimers
+                self.start()
             }
-            
-            currentTimerType = .delay
-            timeRemaining = settings.delayBetweenTimers
-            start()
         }
     }
     
@@ -257,19 +376,25 @@ class TimerManager: ObservableObject {
     func stop() {
         timer?.invalidate()
         breakEngagementTimer?.invalidate()
-        isRunning = false
-        resetTimer()
-        currentCycle = 1
-        currentTimerType = .work
+        
+        DispatchQueue.main.async {
+            self.isRunning = false
+            self.resetTimer()
+            self.currentCycle = 1
+            self.currentTimerType = .work
+            self.shouldShowInputPrompt = false
+            self.currentInput = ""
+            self.dismissAIInteraction()
+        }
+        
         workPeriod = nil
-        shouldShowInputPrompt = false
-        currentInput = ""
-        dismissAIInteraction()
     }
     
     func updateSettings(_ newSettings: TimerSettings) {
-        settings = newSettings
-        settings.save()
-        resetTimer()
+        DispatchQueue.main.async {
+            self.settings = newSettings
+            self.settings.save()
+            self.resetTimer()
+        }
     }
 } 

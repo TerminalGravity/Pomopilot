@@ -49,15 +49,20 @@ class SessionManager: ObservableObject {
     }
     
     func startNewSession() {
-        currentSession = Session(startTime: Date())
-        saveCurrentSession()
+        DispatchQueue.main.async {
+            self.currentSession = Session(startTime: Date())
+            self.saveCurrentSession()
+        }
     }
     
     func addWorkPeriodToCurrentSession(_ workPeriod: WorkPeriod) {
         guard var session = currentSession else { return }
-        session.workPeriods.append(workPeriod)
-        currentSession = session
-        saveCurrentSession()
+        
+        DispatchQueue.main.async {
+            session.workPeriods.append(workPeriod)
+            self.currentSession = session
+            self.saveCurrentSession()
+        }
     }
     
     func addBreakFeedback(workPeriodId: String, feedback: String, aiResponse: String) {
@@ -67,9 +72,12 @@ class SessionManager: ObservableObject {
             var workPeriod = session.workPeriods[index]
             workPeriod.breakFeedback = feedback
             workPeriod.aiResponse = aiResponse
-            session.workPeriods[index] = workPeriod
-            currentSession = session
-            saveCurrentSession()
+            
+            DispatchQueue.main.async {
+                session.workPeriods[index] = workPeriod
+                self.currentSession = session
+                self.saveCurrentSession()
+            }
         }
     }
     
@@ -81,19 +89,21 @@ class SessionManager: ObservableObject {
         generateAIReport(for: session) { [weak self] report in
             guard let self = self else { return }
             
-            session.aiReport = report
-            
-            // Update current session
-            self.currentSession = session
-            
-            // Update sessions list
-            if let index = self.sessions.firstIndex(where: { $0.id == session.id }) {
-                self.sessions[index] = session
-            } else {
-                self.sessions.append(session)
+            DispatchQueue.main.async {
+                session.aiReport = report
+                
+                // Update current session
+                self.currentSession = session
+                
+                // Update sessions list
+                if let index = self.sessions.firstIndex(where: { $0.id == session.id }) {
+                    self.sessions[index] = session
+                } else {
+                    self.sessions.append(session)
+                }
+                
+                self.saveSessions()
             }
-            
-            self.saveSessions()
         }
     }
     
@@ -104,10 +114,72 @@ class SessionManager: ObservableObject {
         }
     }
     
+    // MARK: - Persistence
+    
+    private func loadSessions() {
+        if let data = UserDefaults.standard.data(forKey: "savedSessions") {
+            if let decoded = try? JSONDecoder().decode([Session].self, from: data) {
+                DispatchQueue.main.async {
+                    self.sessions = decoded
+                    
+                    // Find any active session
+                    self.currentSession = self.sessions.first(where: { $0.endTime == nil })
+                }
+            }
+        }
+    }
+    
+    private func saveCurrentSession() {
+        guard let currentSession = currentSession else { return }
+        
+        // Update the session in the sessions array if it exists, otherwise add it
+        if let index = sessions.firstIndex(where: { $0.id == currentSession.id }) {
+            DispatchQueue.main.async {
+                self.sessions[index] = currentSession
+                self.saveSessions()
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.sessions.append(currentSession)
+                self.saveSessions()
+            }
+        }
+    }
+    
+    private func saveSessions() {
+        if let encoded = try? JSONEncoder().encode(sessions) {
+            UserDefaults.standard.set(encoded, forKey: "savedSessions")
+        }
+    }
+    
+    // MARK: - List Management
+    
+    func deleteSession(at indexSet: IndexSet) {
+        DispatchQueue.main.async {
+            // If the deleted session is the current session, clear it
+            for index in indexSet {
+                if index < self.sessions.count {
+                    let sessionToDelete = self.sessions[index]
+                    if sessionToDelete.id == self.currentSession?.id {
+                        self.currentSession = nil
+                    }
+                }
+            }
+            
+            // Remove the sessions
+            self.sessions.remove(atOffsets: indexSet)
+            self.saveSessions()
+        }
+    }
+    
+    // MARK: - Export Functionality
+    
     func exportToGoogleDocs(session: Session) {
-        isExporting = true
-        exportError = nil
-        exportSuccess = false
+        DispatchQueue.main.async {
+            self.isExporting = true
+            self.exportError = nil
+            self.exportSuccess = false
+        }
         
         // In a real app, you would integrate with Google Docs API here
         // For this example, we'll simulate the export with a delay
@@ -116,57 +188,84 @@ class SessionManager: ObservableObject {
             guard let self = self else { return }
             
             // Simulate success
-            self.isExporting = false
-            self.exportSuccess = true
-            
-            // Add a fake Google Docs link to the session
-            if var updatedSession = self.sessions.first(where: { $0.id == session.id }) {
-                updatedSession.googleDocsLink = "https://docs.google.com/document/d/\(UUID().uuidString)"
+            DispatchQueue.main.async {
+                // Add a fake Google Docs link to the session
+                if var updatedSession = self.sessions.first(where: { $0.id == session.id }) {
+                    updatedSession.googleDocsLink = "https://docs.google.com/document/d/\(UUID().uuidString)"
+                    
+                    if let index = self.sessions.firstIndex(where: { $0.id == session.id }) {
+                        self.sessions[index] = updatedSession
+                        self.saveSessions()
+                    }
+                }
                 
-                if let index = self.sessions.firstIndex(where: { $0.id == session.id }) {
-                    self.sessions[index] = updatedSession
-                    self.saveSessions()
+                self.isExporting = false
+                self.exportSuccess = true
+                
+                // Reset success state after a delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    self.exportSuccess = false
                 }
             }
+        }
+    }
+    
+    func exportSessions() {
+        DispatchQueue.main.async {
+            self.isExporting = true
+            self.exportError = nil
+            self.exportSuccess = false
+        }
+        
+        // Create a formatted JSON file with sessions data
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        let fileName = "pomopilot_sessions_\(dateFormatter.string(from: Date())).json"
+        
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        encoder.dateEncodingStrategy = .iso8601
+        
+        guard let jsonData = try? encoder.encode(sessions) else {
+            DispatchQueue.main.async {
+                self.isExporting = false
+                self.exportError = "Failed to encode session data"
+            }
+            return
+        }
+        
+        // Get the Documents directory URL
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            DispatchQueue.main.async {
+                self.isExporting = false
+                self.exportError = "Couldn't access documents directory"
+            }
+            return
+        }
+        
+        let fileURL = documentsDirectory.appendingPathComponent(fileName)
+        
+        // Write to the file
+        do {
+            try jsonData.write(to: fileURL)
             
-            // Reset success state after a delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                self.exportSuccess = false
+            DispatchQueue.main.async {
+                self.isExporting = false
+                self.exportSuccess = true
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.isExporting = false
+                self.exportError = "Failed to write file: \(error.localizedDescription)"
             }
         }
     }
     
-    private func saveCurrentSession() {
-        guard let session = currentSession else { return }
-        
-        if let index = sessions.firstIndex(where: { $0.id == session.id }) {
-            sessions[index] = session
-        } else {
-            sessions.append(session)
+    func deleteAllSessions() {
+        DispatchQueue.main.async {
+            self.sessions = []
+            self.currentSession = nil
+            UserDefaults.standard.removeObject(forKey: "savedSessions")
         }
-        
-        saveSessions()
-    }
-    
-    private func saveSessions() {
-        if let data = try? JSONEncoder().encode(sessions) {
-            UserDefaults.standard.set(data, forKey: "savedSessions")
-        }
-    }
-    
-    private func loadSessions() {
-        guard let data = UserDefaults.standard.data(forKey: "savedSessions"),
-              let savedSessions = try? JSONDecoder().decode([Session].self, from: data) else {
-            return
-        }
-        sessions = savedSessions
-        
-        // Find any active session
-        currentSession = sessions.first(where: { !$0.isCompleted })
-    }
-    
-    func deleteSession(at indexSet: IndexSet) {
-        sessions.remove(atOffsets: indexSet)
-        saveSessions()
     }
 } 

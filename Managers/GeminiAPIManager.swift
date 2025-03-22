@@ -3,12 +3,53 @@ import Combine
 
 class GeminiAPIManager: ObservableObject {
     // API configuration
-    private let apiKey: String = "" // Set your Gemini API key in production
+    private let apiKey: String
     private let apiBaseURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
     
     // Published properties
     @Published var isLoading = false
     @Published var errorMessage: String?
+    
+    init() {
+        // Load API key from environment or secure storage
+        if let apiKeyFromEnvironment = ProcessInfo.processInfo.environment["GEMINI_API_KEY"] {
+            self.apiKey = apiKeyFromEnvironment
+        } else if let apiKeyFromBundle = Bundle.main.infoDictionary?["GEMINI_API_KEY"] as? String {
+            self.apiKey = apiKeyFromBundle
+        } else {
+            // For development only - never ship with hardcoded keys
+            #if DEBUG
+            self.apiKey = "" // Development placeholder
+            #else
+            self.apiKey = ""
+            #endif
+        }
+    }
+    
+    // Process conversation input for voice interaction feature
+    func processStartConversation(input: String, completion: @escaping (String) -> Void) {
+        let prompt: String
+        
+        // Check for specific intents
+        if input.lowercased().contains("what") && 
+           (input.lowercased().contains("work on") || input.lowercased().contains("do today")) {
+            prompt = "The user is asking about what to work on. Respond helpfully and ask what specific task they want to focus on for their Pomodoro session."
+        } else if containsReadyTrigger(input) {
+            prompt = "The user seems ready to start their Pomodoro session. Ask them if they're ready to begin the timer."
+        } else if input.count < 10 {
+            prompt = "The user provided a short response: '\(input)'. Based on this, ask them to elaborate on what they want to accomplish during their Pomodoro session today."
+        } else {
+            prompt = "User is starting a Pomodoro session and said: '\(input)'. Respond conversationally and help them focus on their task. If they've shared what they're working on, acknowledge it and ask if they're ready to start the timer."
+        }
+        
+        generateResponse(prompt: prompt, completion: completion)
+    }
+    
+    private func containsReadyTrigger(_ input: String) -> Bool {
+        let readyPhrases = ["ready", "let's go", "start", "begin", "yes", "sure", "okay", "ok"]
+        let lowerInput = input.lowercased()
+        return readyPhrases.contains { lowerInput.contains($0) }
+    }
     
     // Request AI reminder for end of work session
     func getEndOfSessionReminder(completion: @escaping (String) -> Void) {
@@ -30,7 +71,18 @@ class GeminiAPIManager: ObservableObject {
         for (index, period) in workPeriods.enumerated() {
             let duration = period.endTime?.timeIntervalSince(period.startTime) ?? 0
             let minutes = Int(duration / 60)
-            prompt += "Session \(index + 1) (\(minutes) minutes): \(period.input)\n"
+            
+            prompt += "Session \(index + 1) (\(minutes) minutes):\n"
+            
+            if !period.taskDescription.isEmpty {
+                prompt += "Working on: \(period.taskDescription)\n"
+            }
+            
+            if !period.voiceConversation.isEmpty {
+                prompt += "Initial conversation: \(period.voiceConversation)\n"
+            }
+            
+            prompt += "Accomplishments: \(period.input)\n\n"
         }
         
         prompt += "\nProvide actionable insights about productivity patterns, focused work time quality, and suggestions for improvement."
@@ -86,22 +138,28 @@ class GeminiAPIManager: ObservableObject {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = jsonData
         
-        self.isLoading = true
+        // Update state on main thread to avoid threading issues
+        DispatchQueue.main.async {
+            self.isLoading = true
+            self.errorMessage = nil
+        }
         
         // Perform the request
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
-                self?.isLoading = false
+                guard let self = self else { return }
+                
+                self.isLoading = false
                 
                 // Handle errors
                 if let error = error {
-                    self?.errorMessage = error.localizedDescription
+                    self.errorMessage = error.localizedDescription
                     completion("Sorry, I encountered an error: \(error.localizedDescription)")
                     return
                 }
                 
                 guard let data = data else {
-                    self?.errorMessage = "No data received"
+                    self.errorMessage = "No data received"
                     completion("Sorry, I didn't receive any response.")
                     return
                 }
@@ -117,11 +175,19 @@ class GeminiAPIManager: ObservableObject {
                        let text = firstPart["text"] as? String {
                         completion(text)
                     } else {
-                        self?.errorMessage = "Invalid response format"
-                        completion("Sorry, I couldn't understand the response.")
+                        // Check for error message in the response
+                        if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                           let error = json["error"] as? [String: Any],
+                           let message = error["message"] as? String {
+                            self.errorMessage = "API Error: \(message)"
+                            completion("Sorry, there was an API error: \(message)")
+                        } else {
+                            self.errorMessage = "Invalid response format"
+                            completion("Sorry, I couldn't understand the response.")
+                        }
                     }
                 } catch {
-                    self?.errorMessage = "JSON parsing error: \(error.localizedDescription)"
+                    self.errorMessage = "JSON parsing error: \(error.localizedDescription)"
                     completion("Sorry, I couldn't process the response.")
                 }
             }
@@ -138,7 +204,11 @@ class GeminiAPIManager: ObservableObject {
             return "Productivity Report: You had 3 focused work sessions with good output. Your second session appears to have been your most productive. Consider scheduling challenging tasks during that time of day for peak performance."
         } else if prompt.contains("break-time feedback") {
             return "Thanks for sharing that. It sounds like you found some good momentum in your last session. For your next session, consider setting a specific mini-goal to maintain that focus. What would be a satisfying accomplishment to reach in the next 25 minutes?"
+        } else if prompt.contains("start") || prompt.contains("ready to begin") {
+            return "Great! Are you ready to start the timer and begin your focused work session?"
+        } else if prompt.contains("Pomodoro session") {
+            return "I see you're planning to work on something. Could you tell me more about what you'll be focusing on during this Pomodoro session?"
         }
-        return "I'm here to help you stay productive. Let me know if you need anything specific."
+        return "I'm here to help you stay productive. What would you like to focus on during your Pomodoro session today?"
     }
 } 

@@ -6,13 +6,15 @@ struct TimerSettings: Codable {
     var longBreakDuration: Int // in minutes
     var cyclesBeforeLongBreak: Int
     var delayBetweenTimers: Int // in seconds
+    var useVoiceInteraction: Bool // whether to use voice interaction for session start
     
     static let `default` = TimerSettings(
         workDuration: 25,
         shortBreakDuration: 5,
         longBreakDuration: 15,
         cyclesBeforeLongBreak: 4,
-        delayBetweenTimers: 30
+        delayBetweenTimers: 30,
+        useVoiceInteraction: true
     )
     
     static func load() -> TimerSettings {

@@ -27,8 +27,15 @@ targets:
           NSAllowsArbitraryLoads: true
         NSUserActivityTypes:
           - com.rinngroup.pomopilot.session
+        NSMicrophoneUsageDescription: "Pomopilot needs microphone access to enable voice interaction with the AI assistant."
+        NSSpeechRecognitionUsageDescription: "Pomopilot needs speech recognition permission to understand your voice commands."
     settings:
       base:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         DEVELOPMENT_TEAM: "" # You can add your team ID here if needed
-    dependencies: [] 
+    dependencies:
+      - package: GoogleGenerativeAI
+packages:
+  GoogleGenerativeAI:
+    url: https://github.com/google/generative-ai-swift
+    from: 0.4.4 

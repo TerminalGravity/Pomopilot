@@ -31,7 +31,9 @@ struct ReportsView: View {
                             SessionRow(session: session)
                         }
                     }
-                    .onDelete(perform: sessionManager.deleteSession)
+                    .onDelete { indexSet in
+                        sessionManager.deleteSession(at: indexSet)
+                    }
                 }
                 .navigationTitle("Reports")
                 .toolbar {
@@ -180,11 +182,50 @@ struct WorkPeriodCard: View {
     let period: WorkPeriod
     let index: Int
     
+    @State private var showVoiceConversation = false
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Period \(index + 1)")
                 .font(.headline)
                 .foregroundColor(.primary)
+            
+            if !period.taskDescription.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Working On:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Text(period.taskDescription)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.bottom, 4)
+            }
+            
+            if !period.voiceConversation.isEmpty {
+                Button {
+                    showVoiceConversation.toggle()
+                } label: {
+                    HStack {
+                        Image(systemName: "waveform")
+                            .foregroundColor(.purple)
+                        Text("Voice Conversation")
+                            .foregroundColor(.purple)
+                        Spacer()
+                        Image(systemName: showVoiceConversation ? "chevron.up" : "chevron.down")
+                            .foregroundColor(.purple)
+                    }
+                    .padding(.vertical, 6)
+                }
+                
+                if showVoiceConversation {
+                    Text(period.voiceConversation)
+                        .font(.body)
+                        .padding(10)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
             
             if !period.input.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {

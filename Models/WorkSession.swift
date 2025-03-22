@@ -14,6 +14,8 @@ struct WorkPeriod: Identifiable, Codable {
     var startTime: Date
     var endTime: Date?
     var input: String = ""
+    var taskDescription: String = "" // What the user is working on for this period
+    var voiceConversation: String = "" // Conversation from voice interaction
     var breakFeedback: String = ""
     var aiResponse: String = ""
     
@@ -56,6 +58,15 @@ struct Session: Identifiable, Codable {
         report += "## Work Periods\n\n"
         for (index, period) in workPeriods.enumerated() {
             report += "### Period \(index + 1) - \(formatDuration(period.duration))\n\n"
+            
+            if !period.taskDescription.isEmpty {
+                report += "**Working On:**\n\(period.taskDescription)\n\n"
+            }
+            
+            if !period.voiceConversation.isEmpty {
+                report += "**Initial Conversation:**\n\(period.voiceConversation)\n\n"
+            }
+            
             report += "**Accomplishments:**\n\(period.input)\n\n"
             
             if !period.breakFeedback.isEmpty {

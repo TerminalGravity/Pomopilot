@@ -81,6 +81,14 @@ struct TimerView: View {
         .sheet(isPresented: $timerManager.shouldShowInputPrompt) {
             WorkInputView()
         }
+        // New sheet for session start prompt
+        .sheet(isPresented: $timerManager.shouldShowSessionStartPrompt) {
+            SessionStartInputView()
+        }
+        // New sheet for voice interaction
+        .sheet(isPresented: $timerManager.shouldShowVoiceInteraction) {
+            VoiceInteractionView()
+        }
         // AI Reminder Alert (2 minutes before end of work session)
         .alert("Time to wrap up!", isPresented: $timerManager.showAIReminder) {
             Button("Got it", role: .cancel) {
@@ -113,6 +121,53 @@ struct TimerView: View {
             return .purple
         case .delay:
             return .orange
+        }
+    }
+}
+
+// New view for session start input
+struct SessionStartInputView: View {
+    @EnvironmentObject var timerManager: TimerManager
+    @State private var input = ""
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("What are you working on today?")
+                    .font(.headline)
+                
+                TextEditor(text: $input)
+                    .padding(10)
+                    .frame(height: 200)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+                    .focused($isFocused)
+                    .onAppear {
+                        isFocused = true
+                    }
+                
+                HStack {
+                    Button("Skip") {
+                        timerManager.startTimerWithInput("")
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Spacer()
+                    
+                    Button("Start Session") {
+                        timerManager.startTimerWithInput(input)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .padding()
+            .navigationTitle("New Session")
+            .navigationBarTitleDisplayMode(.inline)
+            .interactiveDismissDisabled()
         }
     }
 }

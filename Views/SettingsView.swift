@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var longBreakDuration: Double
     @State private var cyclesBeforeLongBreak: Double
     @State private var delayBetweenTimers: Double
+    @State private var useVoiceInteraction: Bool
     @State private var showSavedBanner = false
     
     init() {
@@ -16,6 +17,7 @@ struct SettingsView: View {
         _longBreakDuration = State(initialValue: Double(settings.longBreakDuration))
         _cyclesBeforeLongBreak = State(initialValue: Double(settings.cyclesBeforeLongBreak))
         _delayBetweenTimers = State(initialValue: Double(settings.delayBetweenTimers))
+        _useVoiceInteraction = State(initialValue: settings.useVoiceInteraction)
     }
     
     var body: some View {
@@ -92,6 +94,21 @@ struct SettingsView: View {
                     }
                 }
                 
+                Section(header: Text("Interaction")) {
+                    Toggle("Use Voice Interaction", isOn: $useVoiceInteraction)
+                        .toggleStyle(SwitchToggleStyle(tint: .blue))
+                    
+                    if useVoiceInteraction {
+                        Text("At the start of each session, you'll be prompted to talk with AI about what you're working on.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("You'll be asked to type what you're working on at the start of each session.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
                 Section {
                     Button("Save Settings") {
                         saveSettings()
@@ -142,7 +159,8 @@ struct SettingsView: View {
             shortBreakDuration: Int(shortBreakDuration),
             longBreakDuration: Int(longBreakDuration),
             cyclesBeforeLongBreak: Int(cyclesBeforeLongBreak),
-            delayBetweenTimers: Int(delayBetweenTimers)
+            delayBetweenTimers: Int(delayBetweenTimers),
+            useVoiceInteraction: useVoiceInteraction
         )
         
         timerManager.updateSettings(newSettings)
@@ -159,6 +177,7 @@ struct SettingsView: View {
         longBreakDuration = Double(defaultSettings.longBreakDuration)
         cyclesBeforeLongBreak = Double(defaultSettings.cyclesBeforeLongBreak)
         delayBetweenTimers = Double(defaultSettings.delayBetweenTimers)
+        useVoiceInteraction = defaultSettings.useVoiceInteraction
         
         timerManager.updateSettings(defaultSettings)
         
